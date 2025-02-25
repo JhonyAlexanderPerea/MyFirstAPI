@@ -14,7 +14,7 @@ Este en un pequeño proyecto desarrollado en Spring Boot con OpenAPI para gestio
   
 - OpenAPI
   
-- PostgreSQL
+- PostgreSQL/H2 (Para pruebas)
   
 - Lombok
 </h4>
