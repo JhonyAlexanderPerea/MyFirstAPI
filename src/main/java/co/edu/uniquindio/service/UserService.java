@@ -1,67 +1,86 @@
 package co.edu.uniquindio.service;
 
+import co.edu.uniquindio.dto.UserRegistrationDTO;
+import co.edu.uniquindio.dto.UserResponseDTO;
+import co.edu.uniquindio.dto.PasswordUpdateDTO;
 import co.edu.uniquindio.model.User;
 import co.edu.uniquindio.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+   // private final BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+        //this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    // Obtener usuarios paginados
-    public List<User> getUsers(int page, int size) {
-        return userRepository.findAll(PageRequest.of(Math.max(0, page - 1), size)).getContent();
+    public List<UserResponseDTO> getAllUsers() {
+        return userRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    // Buscar usuario por ID
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
-    }
-
-    // Crear usuario con contraseña encriptada
-    public User createUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("El email ya está registrado.");
+    public Optional<UserResponseDTO> getUserById(UUID id) {
+        try {
+            UUID uuid = UUID.fromString(String.valueOf(id));
+            return userRepository.findById(uuid)
+                    .map(user -> new UserResponseDTO(user.getId(), user.getFullName(), user.getEmail(), user.getDateOfBirth(), user.getRol()));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
     }
 
-    // Eliminar usuario por ID
-    public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new RuntimeException("Usuario no encontrado.");
+
+    public UserResponseDTO registerUser(UserRegistrationDTO dto) {
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new RuntimeException("Correo ya registrado");
         }
+
+        User user = User.builder()
+                .email(dto.getEmail())
+                .password(dto.getPassword())
+                .fullName(dto.getFullName())
+                .dateOfBirth(dto.getDateBirth())
+                .rol(User.Rol.valueOf(dto.getRol().toUpperCase()))
+                .build();
+
+        userRepository.save(user);
+        return convertToDTO(user);
+    }
+
+    public void deleteUser(UUID id) {
         userRepository.deleteById(id);
     }
 
-    // Actualizar usuario
-    public User updateUser(Long id, User userUpdate) {
-        return userRepository.findById(id).map(user -> {
-            user.setFullName(userUpdate.getFullName());
-            user.setDateOfBirth(userUpdate.getDateOfBirth());
-            user.setRol(userUpdate.getRol());
+    public UserResponseDTO updateUserPassword(UUID id, PasswordUpdateDTO dto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-            // Si la nueva contraseña no está vacía, la actualizamos
-            if (userUpdate.getPassword() != null && !userUpdate.getPassword().isEmpty()) {
-                user.setPassword(passwordEncoder.encode(userUpdate.getPassword()));
-            }
+        if (!Objects.equals(dto.getCurrentPassword(), user.getPassword())) {
+            throw new RuntimeException("Contraseña actual incorrecta");
+        }
 
-            return userRepository.save(user);
-        }).orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
+        user.setPassword(dto.getNewPassword());
+        userRepository.save(user);
+        return convertToDTO(user);
+    }
+
+    private UserResponseDTO convertToDTO(User user) {
+        UserResponseDTO dto = new UserResponseDTO(user.getId(), user.getFullName(), user.getEmail(), user.getDateOfBirth(), user.getRol());
+        dto.setId(user.getId());
+        dto.setEmail(user.getEmail());
+        dto.setFullName(user.getFullName());
+        dto.setDateBirth(user.getDateOfBirth());
+        dto.setRol(user.getRol());
+        return dto;
     }
 }
