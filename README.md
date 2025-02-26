@@ -1,4 +1,4 @@
-<h1>🚀 MiFirstAPI</h1>
+<h1>🚀 MyFirstAPI</h1>
 
 Este en un pequeño proyecto desarrollado en Spring Boot con OpenAPI para gestionar usuarios.
 
