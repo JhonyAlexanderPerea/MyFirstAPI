@@ -1,5 +1,7 @@
 package co.edu.uniquindio.dto;
 
+import co.edu.uniquindio.enums.Rol;
+import co.edu.uniquindio.enums.UserStatus;
 import co.edu.uniquindio.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,5 +18,6 @@ public class UserResponseDTO {
     private String email;
     private String fullName;
     private LocalDate dateBirth;
-    private User.Rol rol;
+    private Rol rol;
+    private UserStatus status;
 }

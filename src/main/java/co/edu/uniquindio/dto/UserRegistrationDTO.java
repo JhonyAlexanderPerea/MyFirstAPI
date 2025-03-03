@@ -1,5 +1,7 @@
 package co.edu.uniquindio.dto;
 
+import co.edu.uniquindio.enums.Rol;
+import co.edu.uniquindio.enums.UserStatus;
 import lombok.Data;
 import java.time.LocalDate;
 
@@ -9,5 +11,5 @@ public class UserRegistrationDTO {
     private String password;
     private String fullName;
     private LocalDate dateBirth;
-    private String rol;
+    private Rol rol;
 }

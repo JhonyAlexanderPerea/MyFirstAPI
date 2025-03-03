@@ -4,9 +4,11 @@
     import jakarta.persistence.*;
     import jakarta.validation.constraints.*;
     import lombok.*;
-
     import java.time.LocalDate;
     import java.util.UUID;
+    import co.edu.uniquindio.enums.Rol;
+    import co.edu.uniquindio.enums.UserStatus;
+
 
     @Entity
     @Table(name = "users")
@@ -50,8 +52,9 @@
         @Column(nullable = false)
         private Rol rol;
 
-        public enum Rol {
-            USER,ADMIN
-        }
+        @NotNull(message = "Debe existir un estado")
+        @Enumerated (EnumType.STRING)
+        @Column(nullable = false)
+        private UserStatus status;
 
     }
