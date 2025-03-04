@@ -3,7 +3,7 @@ package co.edu.uniquindio.service;
 import co.edu.uniquindio.dto.UserRegistrationDTO;
 import co.edu.uniquindio.dto.UserResponseDTO;
 import co.edu.uniquindio.dto.PasswordUpdateDTO;
-import co.edu.uniquindio.enums.Rol;
+import co.edu.uniquindio.enums.UserStatus;
 import co.edu.uniquindio.mappers.UserMapper;
 import co.edu.uniquindio.model.User;
 import co.edu.uniquindio.repository.UserRepository;
@@ -31,7 +31,7 @@ public class UserServiceImp implements UserService {
 
     @Override
     public List<UserResponseDTO> getAllUsers() {
-        return userRepository.findAll().stream().map(userMapper::convertToDTO).collect(Collectors.toList());
+        return userRepository.findAll().stream().map(userMapper::convertFromUserToDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -50,18 +50,13 @@ public class UserServiceImp implements UserService {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new RuntimeException("Correo ya registrado");
         }
-
-        User user = User.builder()
-                .email(dto.getEmail())
-                .password(passwordEncoder.encode(dto.getPassword()))
-                .fullName(dto.getFullName())
-                .dateOfBirth(dto.getDateBirth())
-                .rol(dto.getRol())
-                .status(dto.getStatus())
-                .build();
-
+        User user = userMapper.convertFromDTOToUser(dto);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setStatus(UserStatus.ACTIVE);
+        UserResponseDTO responseDTO = userMapper.convertFromUserToDTO(user);
+        responseDTO.setStatus(user.getStatus());
         userRepository.save(user);
-        return userMapper.convertToDTO(user);
+        return responseDTO;
     }
 
 
@@ -81,7 +76,7 @@ public class UserServiceImp implements UserService {
 
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
-        return userMapper.convertToDTO(user);
+        return userMapper.convertFromUserToDTO(user);
     }
 
 
