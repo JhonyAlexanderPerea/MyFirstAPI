@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
-  title: API de Usuarios
-  description: API para gestionar usuarios
+  title: MyFirstAPI
+  description: Implementación básica de una API para gestionar usuarios
   version: 1.0.0
 
 servers:
@@ -9,7 +9,7 @@ servers:
     description: Servidor local
 
 paths:
-  /users:
+  /api/v1/users:
     get:
       summary: Obtener todos los usuarios
       operationId: getUsers
@@ -39,7 +39,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResponseDTO'
 
-  /users/{id}:
+  /api/v1/users/{id}:
     get:
       summary: Obtener un usuario por ID
       operationId: getUser
@@ -71,7 +71,7 @@ paths:
         '200':
           description: Usuario eliminado correctamente
 
-  /users/{id}/password:
+  /api/v1/users/{id}/password:
     patch:
       summary: Actualizar la contraseña de un usuario
       operationId: updatePassword
