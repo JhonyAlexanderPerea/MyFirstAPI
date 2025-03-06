@@ -4,13 +4,10 @@ import co.edu.uniquindio.dto.UserRegistrationDTO;
 import co.edu.uniquindio.dto.UserResponseDTO;
 import co.edu.uniquindio.dto.PasswordUpdateDTO;
 import co.edu.uniquindio.enums.UserStatus;
-import co.edu.uniquindio.exceptions.EmailAlreadyExitsException;
-import co.edu.uniquindio.exceptions.IncorrectPasswordException;
-import co.edu.uniquindio.exceptions.IncorretIdException;
-import co.edu.uniquindio.exceptions.NotFoundException;
 import co.edu.uniquindio.mappers.UserMapper;
 import co.edu.uniquindio.model.User;
 import co.edu.uniquindio.repository.UserRepository;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -44,7 +41,7 @@ public class UserServiceImp implements UserService {
             UUID uuid = UUID.fromString(String.valueOf(id));
             return userRepository.findById(uuid)
                     .map(user -> new UserResponseDTO(user.getId(), user.getFullName(), user.getEmail(), user.getDateOfBirth(), user.getRol(), user.getStatus()));
-        } catch (IncorretIdException e) {
+        } catch (IllegalArgumentException e) {
             return Optional.empty();
         }
     }
@@ -52,7 +49,7 @@ public class UserServiceImp implements UserService {
     @Override
     public UserResponseDTO registerUser(UserRegistrationDTO dto) {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-            throw new EmailAlreadyExitsException("Correo ya registrado");
+            throw new RuntimeException("Correo ya registrado");
         }
         User user = userMapper.convertFromDTOToUser(dto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -70,14 +67,14 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserResponseDTO updateUserPassword(UUID id, PasswordUpdateDTO dto) {
+    public UserResponseDTO updateUserPassword
+    (UUID id, PasswordUpdateDTO dto)
+    {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
-
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         if (!Objects.equals(dto.getCurrentPassword(), user.getPassword())) {
-            throw new IncorrectPasswordException("Contraseña actual incorrecta");
+            throw new RuntimeException("Contraseña actual incorrecta");
         }
-
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
         return userMapper.convertFromUserToDTO(user);
