@@ -4,6 +4,10 @@ import co.edu.uniquindio.dto.UserRegistrationDTO;
 import co.edu.uniquindio.dto.UserResponseDTO;
 import co.edu.uniquindio.dto.PasswordUpdateDTO;
 import co.edu.uniquindio.enums.UserStatus;
+import co.edu.uniquindio.exceptions.EmailAlreadyExitsException;
+import co.edu.uniquindio.exceptions.IncorrectPasswordException;
+import co.edu.uniquindio.exceptions.IncorretIdException;
+import co.edu.uniquindio.exceptions.NotFoundException;
 import co.edu.uniquindio.mappers.UserMapper;
 import co.edu.uniquindio.model.User;
 import co.edu.uniquindio.repository.UserRepository;
@@ -40,7 +44,7 @@ public class UserServiceImp implements UserService {
             UUID uuid = UUID.fromString(String.valueOf(id));
             return userRepository.findById(uuid)
                     .map(user -> new UserResponseDTO(user.getId(), user.getFullName(), user.getEmail(), user.getDateOfBirth(), user.getRol(), user.getStatus()));
-        } catch (IllegalArgumentException e) {
+        } catch (IncorretIdException e) {
             return Optional.empty();
         }
     }
@@ -48,7 +52,7 @@ public class UserServiceImp implements UserService {
     @Override
     public UserResponseDTO registerUser(UserRegistrationDTO dto) {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-            throw new RuntimeException("Correo ya registrado");
+            throw new EmailAlreadyExitsException("Correo ya registrado");
         }
         User user = userMapper.convertFromDTOToUser(dto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -68,10 +72,10 @@ public class UserServiceImp implements UserService {
     @Override
     public UserResponseDTO updateUserPassword(UUID id, PasswordUpdateDTO dto) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
         if (!Objects.equals(dto.getCurrentPassword(), user.getPassword())) {
-            throw new RuntimeException("Contraseña actual incorrecta");
+            throw new IncorrectPasswordException("Contraseña actual incorrecta");
         }
 
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));

@@ -6,6 +6,7 @@ import co.edu.uniquindio.dto.UserResponseDTO;
 import co.edu.uniquindio.service.UserServiceImp;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserRegistrationDTO dto) {
+    public ResponseEntity<UserResponseDTO> registerUser(@Valid @RequestBody UserRegistrationDTO dto) {
         return ResponseEntity.status(201).body(userServiceImp.registerUser(dto));
     }
 

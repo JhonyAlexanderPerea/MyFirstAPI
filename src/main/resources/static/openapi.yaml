@@ -112,7 +112,7 @@ components:
           type: string
         fullName:
           type: string
-        dateBirth:
+        dateOfBirth:
           type: string
           format: date
         rol:
@@ -130,7 +130,7 @@ components:
           type: string
         password:
           type: string
-        dateBirth:
+        dateOfBirth:
           type: string
           format: date
         rol:
