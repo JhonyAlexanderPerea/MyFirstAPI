@@ -15,7 +15,7 @@ public interface UserMapper {
     @Mapping(target = "dateOfBirth", source = "dateOfBirth")
     UserResponseDTO convertFromUserToDTO(User user);
 
-  //  @Mapping(target = "status", source = "UserStatus") // Estado predeterminado
+    //  @Mapping(target = "status", source = "UserStatus") // Estado predeterminado
     @Mapping(target = "dateOfBirth", source = "dateOfBirth")
     User convertFromDTOToUser(UserRegistrationDTO dto);
 }
