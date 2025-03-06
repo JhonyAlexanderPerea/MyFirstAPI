@@ -98,9 +98,6 @@ paths:
           description: Contraseña actual incorrecta
 
 components:
-  info:
-    title: MyFirstAPI
-    description: Implementación básica de una API RestFul
   schemas:
     UserResponseDTO:
       type: object
