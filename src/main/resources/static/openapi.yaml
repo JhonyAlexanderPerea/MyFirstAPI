@@ -13,6 +13,21 @@ paths:
     get:
       summary: Obtener todos los usuarios
       operationId: getUsers
+      parameters:
+        - name: page
+          in: query
+          description: Número de página (empezando desde 0)
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: Cantidad de elementos por página
+          required: false
+          schema:
+            type: integer
+            default: 10
       responses:
         '200':
           description: Lista de usuarios obtenida correctamente
@@ -21,7 +36,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserResponseDTO'
+                  $ref: '#/components/schemas/PaginatedUserResponse'
     post:
       summary: Registrar un nuevo usuario
       operationId: registerUser
@@ -70,6 +85,34 @@ paths:
       responses:
         '200':
           description: Usuario eliminado correctamente
+    put:
+      summary: Actualizar toda la información de un usuario
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          description: Identificador único del usuario a actualizar
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateDTO"
+      responses:
+        '200':
+          description: Usuario actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDTO'
+        '400':
+          description: Datos de entrada inválidos
+        '404':
+          description: Usuario no encontrado
 
   /api/v1/users/{id}/password:
     patch:
@@ -116,6 +159,24 @@ components:
           type: string
           enum: [USER, ADMIN]
 
+    UserUpdateDTO:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        fullName:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        rol:
+          type: string
+          enum: [USER, ADMIN]
+
     UserRegistrationDTO:
       type: object
       required: [email, fullName, password, dateBirth, rol]
@@ -142,3 +203,23 @@ components:
           type: string
         newPassword:
           type: string
+
+    PaginatedUserResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponseDTO'
+        totalPages:
+          type: integer
+          description: Número total de páginas
+        totalElements:
+          type: integer
+          description: Número total de elementos
+        currentPage:
+          type: integer
+          description: Página actual
+        pageSize:
+          type: integer
+          description: Tamaño de la página

@@ -3,6 +3,7 @@ package co.edu.uniquindio.controller;
 import co.edu.uniquindio.dto.PasswordUpdateDTO;
 import co.edu.uniquindio.dto.UserRegistrationDTO;
 import co.edu.uniquindio.dto.UserResponseDTO;
+import co.edu.uniquindio.dto.UserUpdateDTO;
 import co.edu.uniquindio.service.UserServiceImp;
 import java.util.UUID;
 
@@ -46,5 +47,10 @@ public class UserController {
     @PatchMapping("/{id}/password")
     public ResponseEntity<UserResponseDTO> updatePassword(@PathVariable UUID id, @RequestBody PasswordUpdateDTO dto) {
         return ResponseEntity.ok(userServiceImp.updateUserPassword(id, dto));
+    }
+
+    @PutMapping("")
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable UUID id, @RequestBody UserUpdateDTO dto) {
+        return ResponseEntity.ok(userServiceImp.updateUser(id,dto));
     }
 }

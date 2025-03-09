@@ -3,11 +3,13 @@ package co.edu.uniquindio.service;
 import co.edu.uniquindio.dto.UserRegistrationDTO;
 import co.edu.uniquindio.dto.UserResponseDTO;
 import co.edu.uniquindio.dto.PasswordUpdateDTO;
+import co.edu.uniquindio.dto.UserUpdateDTO;
 import co.edu.uniquindio.enums.UserStatus;
 import co.edu.uniquindio.mappers.UserMapper;
 import co.edu.uniquindio.model.User;
 import co.edu.uniquindio.repository.UserRepository;
 import jakarta.validation.constraints.Pattern;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -78,6 +80,11 @@ public class UserServiceImp implements UserService {
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
         return userMapper.convertFromUserToDTO(user);
+    }
+
+    @Override
+    public UserUpdateDTO updateUser(UUID id, UserUpdateDTO dto) {
+        return null;
     }
 
 

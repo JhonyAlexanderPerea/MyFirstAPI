@@ -3,6 +3,7 @@ package co.edu.uniquindio.service;
 import co.edu.uniquindio.dto.PasswordUpdateDTO;
 import co.edu.uniquindio.dto.UserRegistrationDTO;
 import co.edu.uniquindio.dto.UserResponseDTO;
+import co.edu.uniquindio.dto.UserUpdateDTO;
 import co.edu.uniquindio.model.User;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,5 +17,5 @@ public interface UserService {
     UserResponseDTO registerUser(UserRegistrationDTO dto);
     void deleteUserById(@PathVariable UUID id);
     UserResponseDTO updateUserPassword(@PathVariable UUID id, PasswordUpdateDTO dto);
-
+    UserUpdateDTO updateUser(@PathVariable UUID id, UserUpdateDTO dto);
 }
