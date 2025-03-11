@@ -5,19 +5,16 @@ import co.edu.uniquindio.dto.UserResponseDTO;
 import co.edu.uniquindio.dto.PasswordUpdateDTO;
 import co.edu.uniquindio.dto.UserUpdateDTO;
 import co.edu.uniquindio.enums.UserStatus;
+import co.edu.uniquindio.exceptions.NotFoundException;
 import co.edu.uniquindio.mappers.UserMapper;
 import co.edu.uniquindio.model.User;
 import co.edu.uniquindio.repository.UserRepository;
-import jakarta.validation.constraints.Pattern;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImp implements UserService {
@@ -33,19 +30,16 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public List<UserResponseDTO> getAllUsers() {
-        return userRepository.findAll().stream().map(userMapper::convertFromUserToDTO).collect(Collectors.toList());
+    public Page<UserResponseDTO> getUsers(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return userRepository.findAll(pageRequest)
+                .map(userMapper::convertFromUserToDTO);
     }
 
     @Override
-    public Optional<UserResponseDTO> getUserById(UUID id) {
-        try {
-            UUID uuid = UUID.fromString(String.valueOf(id));
-            return userRepository.findById(uuid)
-                    .map(user -> new UserResponseDTO(user.getId(), user.getFullName(), user.getEmail(), user.getDateOfBirth(), user.getRol(), user.getStatus()));
-        } catch (IllegalArgumentException e) {
-            return Optional.empty();
-        }
+    public Optional<UserResponseDTO> getUserById(String id) {
+        return userRepository.findById(id)
+                .map(userMapper::convertFromUserToDTO);
     }
 
     @Override
@@ -56,36 +50,50 @@ public class UserServiceImp implements UserService {
         User user = userMapper.convertFromDTOToUser(dto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setStatus(UserStatus.ACTIVE);
-        UserResponseDTO responseDTO = userMapper.convertFromUserToDTO(user);
-        responseDTO.setStatus(user.getStatus());
         userRepository.save(user);
-        return responseDTO;
+        return userMapper.convertFromUserToDTO(user);
     }
 
-
     @Override
-    public void deleteUserById(UUID id) {
+    public void deleteUserById(String id) {
+        if (!userRepository.existsById(id)) {
+            throw new NotFoundException("Usuario no encontrado");
+        }
         userRepository.deleteById(id);
     }
 
     @Override
-    public UserResponseDTO updateUserPassword
-    (UUID id, PasswordUpdateDTO dto)
-    {
+    public UserResponseDTO updateUserPassword(String id, PasswordUpdateDTO dto) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        if (!Objects.equals(dto.getCurrentPassword(), user.getPassword())) {
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
             throw new RuntimeException("Contraseña actual incorrecta");
         }
+
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
         return userMapper.convertFromUserToDTO(user);
     }
 
     @Override
-    public UserUpdateDTO updateUser(UUID id, UserUpdateDTO dto) {
-        return null;
+    public UserResponseDTO updateUser(String id, UserUpdateDTO dto) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        User user = userMapper.convertFromUpdateDTOToUser(dto);
+        user.setId(existingUser.getId());
+
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        } else {
+            user.setPassword(existingUser.getPassword());
+        }
+
+        user.setStatus(existingUser.getStatus());
+
+        userRepository.save(user);
+
+        return userMapper.convertFromUserToDTO(user);
     }
-
-
 }

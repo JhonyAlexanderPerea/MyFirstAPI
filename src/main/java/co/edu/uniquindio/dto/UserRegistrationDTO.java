@@ -2,10 +2,7 @@ package co.edu.uniquindio.dto;
 
 import co.edu.uniquindio.enums.Rol;
 import co.edu.uniquindio.enums.UserStatus;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.time.LocalDate;
 
@@ -20,6 +17,7 @@ public class UserRegistrationDTO {
     )
     private String password;
     private String fullName;
+    @Past(message = "La fecha debe estar en pasado")
     private LocalDate dateOfBirth;
     private Rol rol;
 }

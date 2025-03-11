@@ -147,7 +147,7 @@ components:
       properties:
         id:
           type: string
-          format: uuid
+          format: string
         email:
           type: string
         fullName:
@@ -163,9 +163,6 @@ components:
       type: object
       required: [id]
       properties:
-        id:
-          type: string
-          format: uuid
         email:
           type: string
         fullName:

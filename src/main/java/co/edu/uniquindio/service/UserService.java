@@ -6,16 +6,18 @@ import co.edu.uniquindio.dto.UserResponseDTO;
 import co.edu.uniquindio.dto.UserUpdateDTO;
 import co.edu.uniquindio.model.User;
 import java.util.UUID;
+
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    List <UserResponseDTO> getAllUsers();
-    Optional<UserResponseDTO> getUserById(@PathVariable UUID id);
+    Page<UserResponseDTO> getUsers(int page, int size);
+    Optional<UserResponseDTO> getUserById(@PathVariable String id);
     UserResponseDTO registerUser(UserRegistrationDTO dto);
-    void deleteUserById(@PathVariable UUID id);
-    UserResponseDTO updateUserPassword(@PathVariable UUID id, PasswordUpdateDTO dto);
-    UserUpdateDTO updateUser(@PathVariable UUID id, UserUpdateDTO dto);
+    void deleteUserById(@PathVariable String id);
+    UserResponseDTO updateUserPassword(@PathVariable String id, PasswordUpdateDTO dto);
+    UserResponseDTO updateUser(@PathVariable String id, UserUpdateDTO dto);
 }
