@@ -84,7 +84,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Usuario eliminado correctamente
+          description: Usuario eliminado correctamente ✔
     put:
       summary: Actualizar toda la información de un usuario
       operationId: updateUser
