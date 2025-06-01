@@ -30,7 +30,7 @@ paths:
             default: 10
       responses:
         '200':
-          description: Lista de usuarios obtenida correctamente
+          description: Lista de usuarios obtenida correctamente 👌
           content:
             application/json:
               schema:
