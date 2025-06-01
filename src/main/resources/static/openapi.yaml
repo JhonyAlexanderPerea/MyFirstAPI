@@ -84,7 +84,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Usuario eliminado correctamente
+          description: Usuario eliminado correctamente 
     put:
       summary: Actualizar toda la información de un usuario
       operationId: updateUser
@@ -112,7 +112,7 @@ paths:
         '400':
           description: Datos de entrada inválidos
         '404':
-          description: Usuario no encontrado
+          description: Usuario no encontrado 💀
 
   /api/v1/users/{id}/password:
     patch:
